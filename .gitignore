@@ -7,10 +7,12 @@ cc_workspace/
 # ── Project artifacts ────────────────────────────────────────────────
 # Audio corpora downloaded from AudioSet / Zenodo / etc. (hundreds of MB)
 data/
-# Detector runtime output
-logs/
+# Detector runtime output. Patterns without trailing slash match both
+# real directories and symlinks (e.g. when these dirs are symlinked into
+# Dropbox for backup).
+logs
+howl_recordings
 logs_*.txt
-howl_recordings/
 # Cached embeddings (large npz)
 *.npz
 # Local env overrides
