@@ -1,0 +1,34 @@
+# ── Unrelated sibling directories in this workspace ─────────────────
+# (the rabbit_hole/ dir hosts other projects; keep them out of this repo)
+.data/
+Repos/
+cc_workspace/
+
+# ── Project artifacts ────────────────────────────────────────────────
+# Audio corpora downloaded from AudioSet / Zenodo / etc. (hundreds of MB)
+data/
+# Trained log files
+logs/
+logs_*.txt
+# Cached embeddings (large npz)
+*.npz
+# Local env overrides
+.env
+
+# ── Python ───────────────────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# ── ML model artifacts (toggle if you want to commit them) ──────────
+# *.keras
+# *.mlpackage/
+
+# ── Editors / OS ─────────────────────────────────────────────────────
+.idea/
+.vscode/
+.DS_Store
+*.swp
