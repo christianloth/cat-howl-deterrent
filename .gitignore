@@ -17,13 +17,14 @@ howl_recordings/
 .env
 
 # ── Python / uv ──────────────────────────────────────────────────────
+# Note: uv.lock IS committed (this is an application repo, not a library)
+# for reproducible installs via `uv sync`.
 .venv/
 __pycache__/
 *.py[cod]
 *.egg-info/
 build/
 dist/
-uv.lock
 .ruff_cache/
 .pytest_cache/
 
