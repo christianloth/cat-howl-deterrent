@@ -1,6 +1,8 @@
 #!/bin/zsh
 # Overnight cat-howl detector launcher (no coreaudiod restart).
 # Use fix_audio_and_start.sh instead if audio is wedged.
+#
+# Configuration is read from ./.env (copy from .env.example first).
 
 cd "$(dirname "$0")"
 
@@ -22,15 +24,6 @@ echo "  ✓ python mic permission granted"
 pkill -f "cat_howl_deterrent|cat-howl-deterrent" 2>/dev/null
 sleep 1
 mkdir -p logs howl_recordings
-
-export SSL_CERT_FILE="$(.venv/bin/python -c 'import certifi; print(certifi.where())')"
-export REQUESTS_CA_BUNDLE="$SSL_CERT_FILE"
-export PYTHONUNBUFFERED=1
-export BACKEND=cpu
-export LOG_ONLY=1
-export RECORD_HOWLS=1
-export MIC_DEVICE=Yeti
-export MIC_BACKEND=sd
 
 echo
 echo "Step 2: Launching detector..."

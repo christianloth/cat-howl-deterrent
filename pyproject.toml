@@ -15,6 +15,7 @@ dependencies = [
     "tensorflow>=2.16",
     "tensorflow-hub>=0.16",
     "setuptools<81",          # tensorflow_hub still uses pkg_resources
+    "python-dotenv>=1.0",     # auto-load configuration from .env at startup
 ]
 
 [project.optional-dependencies]
