@@ -21,7 +21,7 @@ FRAME_SAMPLES = 15_600        # 0.96 s @ 16 kHz
 # ── Trigger gating ─────────────────────────────────────────────────────────
 TRIGGER_THRESHOLD = 0.5       # Max score across TRIGGER_CLASSES to consider
 SUSTAIN_FRAMES = 2            # Must trigger this many frames in a row
-COOLDOWN_SECONDS = 30         # Min seconds between deterrent pulses
+COOLDOWN_SECONDS = float(os.environ.get("COOLDOWN_SECONDS", "30"))
 HEAD_GATE_THRESHOLD = 0.5     # Verifier-head probability gate
 REQUIRE_HEAD_IF_AVAILABLE = True
 
@@ -51,8 +51,17 @@ TONE_SAMPLE_RATE = 48_000
 
 
 # ── Howl-recording (fine-tuning data capture) ──────────────────────────────
-HOWL_PRE_SECONDS = 3.0
-HOWL_POST_SECONDS = 5.0
+# Recording uses a dynamic post-roll: we keep capturing as long as the cat
+# keeps vocalizing, with a quiet-tail timeout and a hard upper bound.
+HOWL_PRE_SECONDS = float(os.environ.get("HOWL_PRE_SECONDS", "3.0"))
+# Min post-roll after the trigger (always captured, even if cat goes silent).
+HOWL_POST_MIN_SECONDS = float(os.environ.get("HOWL_POST_MIN_SECONDS", "2.0"))
+# Quiet-tail timeout: capture ends after this much continuous below-threshold audio.
+HOWL_TAIL_SECONDS = float(os.environ.get("HOWL_TAIL_SECONDS", "2.0"))
+# Hard upper bound on total capture length (safety net for false-positive lock-ins).
+HOWL_MAX_SECONDS = float(os.environ.get("HOWL_MAX_SECONDS", "20.0"))
+# Cat-class score above which we keep extending the post-roll.
+HOWL_EXTEND_THRESHOLD = float(os.environ.get("HOWL_EXTEND_THRESHOLD", "0.3"))
 
 
 # ── Paths ──────────────────────────────────────────────────────────────────

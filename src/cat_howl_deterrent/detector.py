@@ -132,14 +132,16 @@ def run(cfg: RuntimeConfig) -> None:
                     else np.pad(ring, (FRAME_SAMPLES - ring.shape[0], 0))
                 )
 
-            if recorder is not None:
-                recorder.feed_chunk(resample(chunk_native))
-
             scores, embedding = backend.predict(ring)
 
             trigger_scores = {n: float(scores[i]) for i, n in TRIGGER_CLASSES.items()}
             log_scores = {n: float(scores[i]) for i, n in LOG_CLASSES.items()}
             trigger_class, trigger_score = max(trigger_scores.items(), key=lambda kv: kv[1])
+
+            # Feed the recorder AFTER scoring so we can drive dynamic post-roll
+            # extension off the current cat-class score.
+            if recorder is not None:
+                recorder.feed_chunk(resample(chunk_native), trigger_score)
             top5_idx = np.argsort(scores)[-5:][::-1]
             top5 = [(class_names[i], float(scores[i])) for i in top5_idx]
 
