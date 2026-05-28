@@ -17,7 +17,7 @@ import time
 
 import numpy as np
 
-from cat_howl_deterrent.audio.capture import _MicBase, make_mic_capture
+from cat_howl_deterrent.audio.capture import _MicBase, make_mic_capture, print_speaker_info
 from cat_howl_deterrent.audio.recorder import HowlRecorder
 from cat_howl_deterrent.audio.resample import make_resampler
 from cat_howl_deterrent.classifier.backends import make_backend
@@ -103,6 +103,7 @@ def run(cfg: RuntimeConfig) -> None:
     mic = make_mic_capture(cfg.mic_backend, cfg.mic_device)
     print(f"Mic native rate: {mic.native_sr} Hz → decimating to {SAMPLE_RATE} Hz")
     print(f"Mic backend: {cfg.mic_backend}")
+    print_speaker_info()
 
     resample = make_resampler(mic.native_sr, SAMPLE_RATE)
 

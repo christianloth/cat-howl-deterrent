@@ -213,18 +213,33 @@ def make_mic_capture(backend: str, mic_device: str | None) -> _MicBase:
                 f"(in_ch={info['max_input_channels']}, sr={native_sr})"
             )
         else:
+            # No MIC_DEVICE pinned → resolve the underlying system-default input.
+            # `sd.default.device[0]` is often -1 ("use system default"), which
+                # makes sd.query_devices raise; querying by kind='input' falls
+            # back to CoreAudio's actual default and gives us a real name.
             default_in = (
                 sd.default.device[0]
                 if isinstance(sd.default.device, (list, tuple))
                 else sd.default.device
             )
+            info = None
             try:
                 info = sd.query_devices(default_in)
-                native_sr = int(info["default_samplerate"])
-                print(f"Mic: [{default_in}] {info['name']} (default)")
             except Exception:
+                try:
+                    info = sd.query_devices(kind="input")
+                    default_in = info.get("index", default_in)
+                except Exception:
+                    info = None
+            if info is not None:
+                native_sr = int(info["default_samplerate"])
+                print(
+                    f"Mic: system default → [{default_in}] {info['name']} "
+                    f"(in_ch={info['max_input_channels']}, sr={native_sr})"
+                )
+            else:
                 native_sr = SAMPLE_RATE
-                print("Mic: system default")
+                print("Mic: system default (device name unresolved)")
         hop_native = int(round(native_sr * HOP_SECONDS))
         return SoundDeviceMic(device_index, native_sr, hop_native)
 
@@ -235,3 +250,34 @@ def make_mic_capture(backend: str, mic_device: str | None) -> _MicBase:
         return FFmpegMic(mic_device, native_sr, hop_native)
 
     raise SystemExit(f"unknown MIC_BACKEND={backend!r}")
+
+
+def print_speaker_info() -> None:
+    """Log the output device the deterrent tone will route to.
+
+    The deterrent uses sd.play() with no explicit device, so it follows the
+    system default output. Same default-resolution trick as the mic path:
+    sd.default.device[1] can be -1, so fall back to kind='output'.
+    """
+    default_out = (
+        sd.default.device[1]
+        if isinstance(sd.default.device, (list, tuple))
+        else sd.default.device
+    )
+    info = None
+    try:
+        info = sd.query_devices(default_out)
+    except Exception:
+        try:
+            info = sd.query_devices(kind="output")
+            default_out = info.get("index", default_out)
+        except Exception:
+            info = None
+    if info is not None:
+        print(
+            f"Speaker: system default → [{default_out}] {info['name']} "
+            f"(out_ch={info['max_output_channels']}, "
+            f"sr={int(info['default_samplerate'])})"
+        )
+    else:
+        print("Speaker: system default (device name unresolved)")
